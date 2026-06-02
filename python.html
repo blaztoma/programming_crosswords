@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Crossword</title>
+<style>
+  :root {
+    --bg:        #f7f7f4;
+    --surface:   #ffffff;
+    --ink:       #1c1c1a;
+    --muted:     #6b6b66;
+    --line:      #c9c9c2;
+    --gridline:  #8a8a82;
+    --black:     #1c1c1a;
+    --active:    #ffe6a3;
+    --word:      #fff6dd;
+    --correct:   #c6f4d6;
+    --error:     #ffd6d6;
+    --accent:    #d8602f;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#16161a; --surface:#1f1f24; --ink:#ececec; --muted:#9a9a96;
+      --line:#3a3a40; --gridline:#55555c; --black:#0c0c0e; --active:#5a4a1e; --word:#3a3320;
+      --correct:#1d5f43; --error:#5f2424; --accent:#f08a5d;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--mono);
+    background: var(--bg); color: var(--ink);
+    line-height: 1.5; padding: 1.5rem; max-width: 1200px; margin: 0 auto;
+  }
+  header { margin-bottom: 1.25rem; }
+  h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; }
+  .tagline { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+  .tagline code { background: var(--surface); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; }
+
+  .layout { display: flex; gap: 2rem; flex-wrap: nowrap; align-items: flex-start; justify-content: center; }
+  @media (max-width: 900px) {
+    .layout { flex-wrap: wrap; }
+  }
+  .board-col { flex: 0 0 auto; }
+  .side-col  { flex: 0 0 400px; min-width: 250px; }
+
+  /* ---- grid style ---- */
+  /* gridlines: the table background shows through 2px gaps between cells */
+  table.board {
+    border-collapse: separate;
+    border-spacing: 2px;
+    background: var(--gridline);
+    border: 2px solid var(--gridline);
+    border-radius: 4px;
+  }
+  table.board td { padding: 0; }
+  .cell {
+    width: 32px; height: 32px; position: relative;
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none;
+  }
+  .cell.block { background: var(--black); cursor: default; }
+  .cell.in-word { background: var(--word); }
+  .cell.correct { background: var(--correct); }
+  .cell.error   { background: var(--error); }
+
+  /* active cell: bold ring + filled bg, so it's obvious where typing lands */
+  .cell.active {
+    background: var(--active);
+    box-shadow: inset 0 0 0 3px var(--accent);
+    z-index: 2;
+  }
+  /* blinking insertion marker inside the active cell */
+  .cell.active::after {
+    content: "";
+    position: absolute; inset: 4px;
+    border-radius: 2px;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px var(--accent);
+    opacity: 0;
+    animation: caret 1.05s steps(1) infinite;
+  }
+  /* hide the marker once the active cell already has a letter */
+  .cell.active.filled::after { animation: none; opacity: 0; }
+  @keyframes caret { 0%,50% { opacity: 0.55; } 51%,100% { opacity: 0; } }
+
+  /* direction arrow on the active cell */
+  .cell.active .dir-arrow {
+    position: absolute;
+    pointer-events: none;
+    color: var(--accent);
+    font-size: 11px; font-weight: 700; line-height: 1;
+    z-index: 3;
+  }
+  .cell.dir-A .dir-arrow { right: 2px; top: 50%; transform: translateY(-50%); }
+  .cell.dir-D .dir-arrow { bottom: 1px; left: 50%; transform: translateX(-50%); }
+
+  .cell input {
+    width: 100%; height: 100%; border: 0; background: transparent;
+    text-align: center; font: 700 14px/1 var(--mono); color: var(--ink);
+    outline: none; caret-color: transparent; padding: 0; position: relative; z-index: 1;
+  }
+  .cell .num {
+    position: absolute; top: 1px; left: 3px;
+    font-size: 9px; font-weight: 400; color: var(--muted);
+    pointer-events: none; line-height: 1;
+  }
+
+  /* direction badge above the board */
+  .dir-indicator {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: var(--muted); margin-bottom: 8px;
+    padding: 3px 8px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  .dir-indicator b { color: var(--accent); }
+
+  /* ---- clues ---- */
+  .clue-group { margin-bottom: 1rem; }
+  .clue-group h2 {
+    font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px; font-weight: 700;
+  }
+  .clue {
+    font-size: 0.8rem; padding: 4px 8px; border-radius: 5px;
+    cursor: pointer; display: flex; gap: 8px;
+  }
+  .clue:hover { background: var(--surface); }
+  .clue.active { background: var(--active); }
+  .clue.solved { color: var(--correct); text-decoration: line-through; opacity: 0.7; }
+  @media (prefers-color-scheme: dark){ .clue.solved{ color:#5dcaa5; } }
+  .clue .n { color: var(--muted); min-width: 1.4em; text-align: right; }
+  .clue code { color: var(--ink); }
+
+  /* ---- status / playground ---- */
+  .panel {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px 12px; margin-top: 12px;
+  }
+  .status { font-size: 0.8rem; min-height: 1.2em; }
+  .status.ok  { color: #1d9e75; }
+  .status.err { color: var(--accent); }
+  .progress { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+  .toolbar { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  button {
+    font: 600 0.78rem var(--mono); padding: 5px 12px; cursor: pointer;
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  button:hover { border-color: var(--ink); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; border-color: var(--line); }
+  .pg label { font-size: 0.75rem; color: var(--muted); }
+  .pg-row { display: flex; gap: 6px; margin-top: 4px; }
+  .pg-row input {
+    flex: 1; font: 0.8rem var(--mono); padding: 6px 8px;
+    background: var(--bg); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 6px;
+  }
+  .pg-out { font-size: 0.78rem; margin-top: 6px; color: var(--muted); white-space: pre-wrap; }
+  .boot {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(247, 247, 244, 0.85);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; font-family: var(--mono); color: var(--ink);
+  }
+  @media (prefers-color-scheme: dark) {
+    .boot { background: rgba(22, 22, 26, 0.85); }
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 4px solid var(--line);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .sr-only { position:absolute; left:-9999px; }
+</style>
+</head>
+<body>
+<header>
+  <div style="float: right;" class="lang-switch">
+    <button onclick="setLang('lt')">LT</button>
+    <button onclick="setLang('en')">EN</button>
+  </div>
+  <h1 id="ui-title">?? Python Crossword</h1>
+  <p class="tagline" id="ui-tagline">every clue is <code>eval(answer)</code> in Python</p>
+</header>
+
+<div id="boot" class="boot">Loading crossword!</div>
+
+<div class="layout">
+  <div class="board-col">
+    <div class="dir-indicator" id="dir-indicator">Click a cell to start</div>
+    <table class="board" id="board" aria-label="crossword grid"></table>
+    <div class="panel">
+      <div class="status" id="status">&nbsp;</div>
+      <div class="progress" id="progress"></div>
+      <div class="toolbar">
+        <button id="btn-check">Check all</button>
+        <button id="btn-reveal">Reveal cell</button>
+        <button id="btn-clear">Clear</button>
+      </div>
+    </div>
+    <div class="panel pg">
+      <label for="pg-in" id="ui-pg-label">Playground  test Python (Enter to run)</label>
+      <div class="pg-row">
+        <input id="pg-in" placeholder="e.g.  1+1   or   not False">
+        <button id="pg-run" disabled>Run</button>
+      </div>
+      <div class="pg-out" id="pg-out"></div>
+    </div>
+  </div>
+
+  <div class="side-col">
+    <div class="clue-group">
+      <h2 id="ui-across">Across</h2>
+      <div id="clues-across"></div>
+    </div>
+    <div class="clue-group">
+      <h2 id="ui-down">Down</h2>
+      <div id="clues-down"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!--  PUZZLE DATA                                                          -->
+<!-- ===================================================================== -->
+<script id="puzzle-data">
+/*
+ * Define crossword here. Two fields:
+ *
+ *   grid:  array of strings, one per row. Use '#' for a block (black square),
+ *          '.' for a fillable cell. All rows must be the same length.
+ *
+ *   clues: { across: [...], down: [...] }
+ *          Each clue = { row, col, clue, answer }
+ *            row/col : 0-indexed coordinates of the FIRST cell of the word
+ *            clue    : the text shown to the player (a Python expression)
+ *            answer  : the string the player types into the cells
+ *
+ *          The word length is derived automatically from the grid shape.
+ *          Clue numbers are assigned automatically (standard crossword rules).
+ *
+ * HOW CHECKING WORKS:
+ *   A word is correct when  repr(eval(typed)) == repr(eval(answer))  in Python.
+ *   So if answer is "2", the player may type "2", "1+1", "len('ab')", etc.
+ *   Set CHECK_MODE = "value" for that behaviour, or "literal" to require the
+ *   typed text to equal `answer` character-for-character.
+ */
+
+window.CHECK_MODE = "value";   // "value"  (eval-equivalent)  |  "literal"
+
+window.PUZZLE = {
+  grid: [
+    "##########.###########",
+    "#########......#######",
+    "##########.#######.###",
+    "#########......###.###",
+    "##########.#######.#.#",
+    "##########.#######.#.#",
+    "######.........###.#.#",
+    "##########.#######.#.#",
+    "##########.##.........",
+    "########.#.#######.#.#",
+    "##.........##........#",
+    "########.###.#####.###",
+    "....................##",
+    "########.###.#########",
+    "########.###.#####.###",
+    "#........#########.###",
+    "########.#########.###",
+    ".##............###.###",
+    ".#######.####.####.###",
+    ".###.#..............##",
+    ".#.#.###.####.###.####",
+    "...........##.###.####",
+    ".#.#.###.####.###.####",
+    "##.#.########.###.####",
+    "##.#.#..........#.####",
+    "##.#.########.###.####",
+    "#######.......########"
+  ],
+  clues: {
+    across: [
+      { row: 1, col: 9, clue_lt: "Gauk sąrašo L ilgį.", clue_en: "Get the length of list L.", answer: "len(L)", init: "L=[1,2,3]" },
+      { row: 3, col: 9, clue_lt: "Paversk L aibe.", clue_en: "Convert L to a set.", answer: "set(L)", init: "L=[1,2,2,3]" },
+      { row: 6, col: 6, clue_lt: "Gauk surikiuotą sąrašo L kopiją.", clue_en: "Get a sorted copy of list L.", answer: "sorted(L)", init: "L=[3,1,2]" },
+      { row: 8, col: 13, clue_lt: "Padalink eilutę s į žodžių sąrašą.", clue_en: "Split string s into a list of words.", answer: "s.split()", init: "s='a b c'" },
+      { row: 10, col: 2, clue_lt: "Pašalink tarpus nuo eilutės s pradžios ir pabaigos.", clue_en: "Remove whitespace from the start and end of string s.", answer: "s.strip()", init: "s='  abc  '" },
+      { row: 10, col: 13, clue_lt: "Sukurk skaičių seką nuo 0 iki n-1.", clue_en: "Create a sequence of numbers from 0 to n-1.", answer: "range(n)", init: "n=5" },
+      { row: 12, col: 0, clue_lt: "Išvesk sąrašo L elementus atvirkštine tvarka atskirose eilutėse.", clue_en: "Print elements of list L in reverse order on separate lines.", answer: "*map(print,L[::-1]),", init: "L=[1,2]" },
+      { row: 15, col: 1, clue_lt: "Išvesk reikšmę x.", clue_en: "Print value x.", answer: "print(x)", init: "x=10" },
+      { row: 17, col: 3, clue_lt: "Gauk poras: indeksas ir sąrašo L elementas.", clue_en: "Get pairs of index and element from list L.", answer: "enumerate(L)", init: "L=['a','b']" },
+      { row: 19, col: 6, clue_lt: "Išvesk sąrašo L elementus atskirose eilutėse.", clue_en: "Print elements of list L on separate lines.", answer: "*map(print,L),", init: "L=[1,2]" },
+      { row: 21, col: 0, clue_lt: "Pridėk reikšmę x į sąrašo L pabaigą.", clue_en: "Append value x to the end of list L.", answer: "L.append(x)", init: "L=[]; x=5" },
+      { row: 24, col: 6, clue_lt: "Suskaičiuok, kiek kartų x yra sąraše L.", clue_en: "Count how many times x appears in list L.", answer: "L.count(x)", init: "L=[1,2,1]; x=1" },
+      { row: 26, col: 7, clue_lt: "Nuskaityk vieną teksto eilutę.", clue_en: "Read one line of text.", answer: "input()", init: "import io, sys; sys.stdin = io.StringIO('test')" }
+    ],
+    down: [
+      { row: 0, col: 10, clue_lt: "Gauk sąrašo L elementų apvertimo iteratorių.", clue_en: "Get an iterator for the reversed elements of list L.", answer: "reversed(L)", init: "L=[1,2]" },
+      { row: 2, col: 18, clue_lt: "Sujunk L eilutes kableliais.", clue_en: "Join strings in L with commas.", answer: "\",\".join(L)", init: "L=['a','b']" },
+      { row: 4, col: 20, clue_lt: "Paversk seką s sąrašu.", clue_en: "Convert sequence s to a list.", answer: "list(s)", init: "s='abc'" },
+      { row: 9, col: 8, clue_lt: "Perskaityk visą failo f turinį.", clue_en: "Read the entire content of file f.", answer: "open(f).read()", init: "f='test.txt'; open(f,'w').write('data')" },
+      { row: 11, col: 12, clue_lt: "Gauk pirmą L elementą.", clue_en: "Get the first element of list L.", answer: "L[0]", init: "L=[1,2]" },
+      { row: 14, col: 18, clue_lt: "Apskaičiuok sąrašo L sumą.", clue_en: "Calculate the sum of list L.", answer: "sum(L)", init: "L=[1,2,3]" },
+      { row: 17, col: 0, clue_lt: "Rask mažiausią L reikšmę.", clue_en: "Find the minimum value in list L.", answer: "min(L)", init: "L=[1,2,3]" },
+      { row: 17, col: 13, clue_lt: "Rask pirmą x poziciją sąraše L.", clue_en: "Find the first position of x in list L.", answer: "L.index(x)", init: "L=[10,20]; x=20" },
+      { row: 19, col: 4, clue_lt: "Pašalink ir grąžink paskutinį L elementą.", clue_en: "Remove and return the last element of list L.", answer: "L.pop()", init: "L=[1,2]" },
+      { row: 19, col: 17, clue_lt: "Gauk sąrašą L atvirkštine tvarka.", clue_en: "Get list L in reverse order.", answer: "L[::-1]", init: "L=[1,2]" },
+      { row: 20, col: 2, clue_lt: "Rask didžiausią L reikšmę.", clue_en: "Find the maximum value in list L.", answer: "max(L)", init: "L=[1,2,3]" }
+    ]
+  }
+};
+</script>
+
+<!-- ===================================================================== -->
+<!--  ENGINE                                                               -->
+<!-- ===================================================================== -->
+<script>
+"use strict";
+
+const Engine = (() => {
+  const cfg = {
+    pyodideUrl: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/",
+    pyodideScript: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js",
+  };
+
+  const TRANSLATIONS = {
+    lt: {
+      title: "Pitono Kryžiažodis",
+      tagline: "Įvedamas rezultatas yra įvykdomas Pitone patikrinimui.",
+      loading: "Kraunama...",
+      clickToStart: "Paspauskite langelį, kad pradėtumėte",
+      checkAll: "Patikrinti visus",
+      revealCell: "Parodyti langelį",
+      clear: "Išvalyti",
+      pgLabel: "Smėliadėžė Pitono kodo testavimui (Enter vykdymui)",
+      pgPlaceholder: "pvz. 1+1 arba not False",
+      pgRun: "Vykdyti",
+      across: "Horizontaliai",
+      down: "Vertikaliai",
+      solved: "išspręsta",
+      solvedAll: "?? Išsprendėte visą kryžiažodį!",
+      typing: "Rašote:",
+      checked: "Patikrinta.",
+      cleared: "Išvalyta.",
+      ready: "Kryžiažodis paruoštas.",
+      failed: "Nepavyko užkrauti: ",
+      loadingCrossword: "Kraunamas kryžiažodis..."
+    },
+    en: {
+      title: "Python Crossword",
+      tagline: "every answer is evaled in Python.",
+      loading: "Loading crossword!",
+      clickToStart: "Click a cell to start",
+      checkAll: "Check all",
+      revealCell: "Reveal cell",
+      clear: "Clear",
+      pgLabel: "Playground  test Python (Enter to run)",
+      pgPlaceholder: "e.g. 1+1 or not False",
+      pgRun: "Run",
+      across: "Across",
+      down: "Down",
+      solved: "solved",
+      solvedAll: "Solved the whole puzzle!",
+      typing: "Typing:",
+      checked: "Checked.",
+      cleared: "Cleared.",
+      ready: "Crossword ready.",
+      failed: "Crossword failed to load: ",
+      loadingCrossword: "? Loading crossword..."
+    }
+  };
+
+  window.LANG = "lt";
+
+  window.setLang = function(l) {
+    window.LANG = l;
+    applyTranslations();
+    renderClues();
+    updateDirIndicator();
+    updateProgress();
+  };
+
+  function applyTranslations() {
+    const t = TRANSLATIONS[window.LANG];
+    document.getElementById("ui-title").textContent = t.title;
+    document.getElementById("ui-tagline").innerHTML = t.tagline;
+    document.getElementById("boot").textContent = t.loading;
+    document.getElementById("btn-check").textContent = t.checkAll;
+    document.getElementById("btn-reveal").textContent = t.revealCell;
+    document.getElementById("btn-clear").textContent = t.clear;
+    document.getElementById("ui-pg-label").textContent = t.pgLabel;
+    document.getElementById("pg-in").placeholder = t.pgPlaceholder;
+    document.getElementById("pg-run").textContent = t.pgRun;
+    document.getElementById("ui-across").textContent = t.across;
+    document.getElementById("ui-down").textContent = t.down;
+    if (!active) document.getElementById("dir-indicator").textContent = t.clickToStart;
+  }
+
+  let py = null, pyReady = false;
+  let grid = [];          // grid[r][c] = true if fillable
+  let rows = 0, cols = 0;
+  let words = [];         // { id, dir, num, row, col, len, clue, answer, cells:[[r,c],...] }
+  let cellWords = {};     // "r,c" -> { A:wordId, D:wordId }
+  let numbers = {};       // "r,c" -> number
+  let letters = {};       // "r,c" -> typed char
+  let solved = new Set(); // word ids
+  let active = null;      // [r,c]
+  let dir = "A";
+
+  const key = (r, c) => r + "," + c;
+  const isBlock = (r, c) => !(grid[r] && grid[r][c]);
+
+  const STORAGE_KEY = "crossword_state";
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      letters,
+      solved: Array.from(solved)
+    }));
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const state = JSON.parse(saved);
+      letters = state.letters || {};
+      solved = new Set(state.solved || []);
+      
+      // Update UI
+      for (const k in letters) {
+        const [r, c] = k.split(",").map(Number);
+        const inp = inputEl(r, c);
+        if (inp) inp.value = letters[k];
+      }
+      
+      updateProgress();
+    } catch (e) {
+      console.error("Failed to load state", e);
+    }
+  }
+
+  // ---- parse puzzle definition ----------------------------------------
+  function parse(puzzle) {
+    grid = puzzle.grid.map(line => line.split("").map(ch => ch !== "#"));
+    rows = grid.length;
+    cols = Math.max(...grid.map(r => r.length));
+
+    // assign numbers
+    let n = 1;
+    numbers = {};
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (isBlock(r, c)) continue;
+        const startA = (c === 0 || isBlock(r, c - 1)) && !isBlock(r, c + 1);
+        const startD = (r === 0 || isBlock(r - 1, c)) && !isBlock(r + 1, c);
+        if (startA || startD) numbers[key(r, c)] = n++;
+      }
+    }
+
+    // build word list from clue definitions, deriving length from grid
+    words = [];
+    cellWords = {};
+    const make = (def, d) => {
+      const cells = [];
+      let r = def.row, c = def.col;
+      while (r < rows && c < cols && !isBlock(r, c)) {
+        cells.push([r, c]);
+        if (d === "A") c++; else r++;
+      }
+      const id = d + ":" + def.row + ":" + def.col;
+      const w = {
+        id, dir: d, num: numbers[key(def.row, def.col)] ?? "?",
+        row: def.row, col: def.col, len: cells.length,
+        clue_lt: def.clue_lt || def.clue,
+        clue_en: def.clue_en || def.clue,
+        answer: def.answer, init: def.init || "", cells,
+      };
+      words.push(w);
+      cells.forEach(([rr, cc]) => {
+        (cellWords[key(rr, cc)] = cellWords[key(rr, cc)] || {})[d] = id;
+      });
+    };
+    (puzzle.clues.across || []).forEach(d => make(d, "A"));
+    (puzzle.clues.down   || []).forEach(d => make(d, "D"));
+  }
+
+  // ---- render ----------------------------------------------------------
+  function render() {
+    const table = document.getElementById("board");
+    table.innerHTML = "";
+    for (let r = 0; r < rows; r++) {
+      const tr = document.createElement("tr");
+      for (let c = 0; c < cols; c++) {
+        const td = document.createElement("td");
+        const div = document.createElement("div");
+        div.className = "cell";
+        if (isBlock(r, c)) {
+          div.classList.add("block");
+        } else {
+          div.dataset.r = r; div.dataset.c = c;
+          if (numbers[key(r, c)]) {
+            const num = document.createElement("span");
+            num.className = "num"; num.textContent = numbers[key(r, c)];
+            div.appendChild(num);
+          }
+          const inp = document.createElement("input");
+          inp.maxLength = 1; inp.autocomplete = "off"; inp.spellcheck = false;
+          inp.setAttribute("aria-label", `row ${r + 1} column ${c + 1}`);
+          inp.addEventListener("keydown", onKey);
+          inp.addEventListener("input", onInput);
+          div.appendChild(inp);
+          div.addEventListener("mousedown", e => { e.preventDefault(); select(r, c, true); });
+        }
+        td.appendChild(div);
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    renderClues();
+  }
+
+  function renderClues() {
+    for (const d of ["A", "D"]) {
+      const box = document.getElementById(d === "A" ? "clues-across" : "clues-down");
+      box.innerHTML = "";
+      words.filter(w => w.dir === d).sort((a, b) => a.num - b.num).forEach(w => {
+        const el = document.createElement("div");
+        el.className = "clue"; el.dataset.id = w.id;
+        if (solved.has(w.id)) el.classList.add("solved");
+        el.innerHTML = `<span class="n">${w.num}.</span><code></code>`;
+        el.querySelector("code").textContent = window.LANG === "lt" ? w.clue_lt : w.clue_en;
+        el.addEventListener("click", () => { dir = d; select(w.row, w.col, false); });
+        box.appendChild(el);
+      });
+    }
+  }
+
+  function cellEl(r, c) {
+    return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+  }
+  function inputEl(r, c) {
+    const el = cellEl(r, c); return el ? el.querySelector("input") : null;
+  }
+
+  // ---- selection & highlight ------------------------------------------
+  function select(r, c, toggle) {
+    if (isBlock(r, c)) return;
+    if (toggle && active && active[0] === r && active[1] === c) {
+      const other = dir === "A" ? "D" : "A";
+      if (cellWords[key(r, c)]?.[other]) dir = other;
+    }
+    if (!cellWords[key(r, c)]?.[dir]) {
+      dir = cellWords[key(r, c)]?.A ? "A" : "D";
+    }
+    active = [r, c];
+    highlight();
+    const inp = inputEl(r, c); if (inp) setTimeout(() => inp.focus(), 0);
+  }
+
+  function activeWord() {
+    if (!active) return null;
+    const id = cellWords[key(active[0], active[1])]?.[dir];
+    return words.find(w => w.id === id) || null;
+  }
+
+  function highlight() {
+    document.querySelectorAll(".cell").forEach(el => {
+      el.classList.remove("active", "in-word", "dir-A", "dir-D", "filled");
+      const arrow = el.querySelector(".dir-arrow");
+      if (arrow) arrow.remove();
+    });
+    document.querySelectorAll(".clue").forEach(el => el.classList.remove("active"));
+    const w = activeWord();
+    if (w) {
+      w.cells.forEach(([r, c]) => cellEl(r, c)?.classList.add("in-word"));
+      document.querySelector(`.clue[data-id="${w.id}"]`)?.classList.add("active");
+    }
+    if (active) {
+      const el = cellEl(active[0], active[1]);
+      if (el) {
+        el.classList.add("active", "dir-" + dir);
+        if (letters[key(active[0], active[1])]) el.classList.add("filled");
+        const arrow = document.createElement("span");
+        arrow.className = "dir-arrow";
+        arrow.setAttribute("aria-hidden", "true");
+        arrow.textContent = dir === "A" ? "→" : "↓";
+        el.appendChild(arrow);
+      }
+    }
+    updateDirIndicator();
+  }
+
+  function updateDirIndicator() {
+    const el = document.getElementById("dir-indicator");
+    if (!el) return;
+    const t = TRANSLATIONS[window.LANG];
+    const w = activeWord();
+    const label = dir === "A" ? t.across : t.down;
+    el.innerHTML = active
+      ? `${t.typing} <b></b>${w ? ` &nbsp;&bull;&nbsp; ${w.num} (${w.len})` : ""}`
+      : t.clickToStart;
+    if (active) el.querySelector("b").textContent = label;
+
+    const runBtn = document.getElementById("pg-run");
+    if (runBtn) runBtn.disabled = !w;
+  }
+
+  // ---- input handling --------------------------------------------------
+  function onInput(e) {
+    if (!active) return;
+    const [r, c] = active;
+    const v = e.target.value.slice(-1);   // last typed char wins -> overwrite
+    if (v) {
+      setCell(r, c, v);
+    } else {
+      letters[key(r, c)] = "";
+      checkCellWords(r, c);
+      saveState();
+    }
+  }
+
+  function onKey(e) {
+    if (!active) return;
+    const [r, c] = active;
+    switch (e.key) {
+      case "ArrowRight": e.preventDefault(); dir = "A"; step(0, 1); break;
+      case "ArrowLeft":  e.preventDefault(); dir = "A"; step(0, -1); break;
+      case "ArrowDown":  e.preventDefault(); dir = "D"; step(1, 0); break;
+      case "ArrowUp":    e.preventDefault(); dir = "D"; step(-1, 0); break;
+      case "Tab":        e.preventDefault(); cycleWord(e.shiftKey); break;
+      case "Backspace":
+        e.preventDefault();
+        if (letters[key(r, c)]) {
+          letters[key(r, c)] = ""; const i = inputEl(r, c); if (i) i.value = "";
+          checkCellWords(r, c);
+          saveState();
+        } else {
+          advance(-1);
+          const [nr, nc] = active;
+          letters[key(nr, nc)] = ""; const i = inputEl(nr, nc); if (i) i.value = "";
+          checkCellWords(nr, nc);
+          saveState();
+        }
+        break;
+      case "Delete":
+        e.preventDefault();
+        letters[key(r, c)] = ""; { const i = inputEl(r, c); if (i) i.value = ""; }
+        checkCellWords(r, c); highlight();
+        saveState();
+        break;
+      default:
+        // single printable character: always overwrite whatever is in the cell
+        if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          e.preventDefault();
+          setCell(r, c, e.key);
+        }
+    }
+  }
+
+  function setCell(r, c, ch) {
+    letters[key(r, c)] = ch;
+    const inp = inputEl(r, c);
+    if (inp) inp.value = ch;
+    advance(1);
+    highlight();
+    checkCellWords(r, c);
+    saveState();
+  }
+
+  function step(dr, dc) {
+    if (!active) return;
+    const nr = active[0] + dr, nc = active[1] + dc;
+    if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && !isBlock(nr, nc))
+      select(nr, nc, false);
+  }
+
+  function advance(d) {
+    const w = activeWord(); if (!w) return;
+    const idx = w.cells.findIndex(([r, c]) => r === active[0] && c === active[1]);
+    const next = idx + d;
+    if (next >= 0 && next < w.cells.length) {
+      active = w.cells[next]; highlight();
+      const i = inputEl(active[0], active[1]); if (i) setTimeout(() => i.focus(), 0);
+    }
+  }
+
+  let order = [], oi = 0;
+  function cycleWord(back) {
+    if (!order.length) order = words.slice();
+    oi = (oi + (back ? -1 : 1) + order.length) % order.length;
+    const w = order[oi]; dir = w.dir; select(w.row, w.col, false);
+  }
+
+  // ---- evaluation ------------------------------------------------------
+  function readWord(w) {
+    return w.cells.map(([r, c]) => letters[key(r, c)] || "").join("");
+  }
+  function isFilled(w) {
+    return w.cells.every(([r, c]) => letters[key(r, c)]);
+  }
+
+  async function evalRepr(expr, initCode = "") {
+    try {
+      if (initCode) {
+        await py.runPythonAsync(initCode);
+      }
+      // Wrap starred expressions like "*map(print,L)," into parentheses "(*map(print,L),)"
+      // to make them valid expressions for Python's eval().
+      let cleanExpr = expr.trim();
+      if (cleanExpr.startsWith("*") && cleanExpr.endsWith(",")) {
+        cleanExpr = "(" + cleanExpr + ")";
+      }
+      const pyCode = `
+import inspect
+def _get_repr(val):
+    if (inspect.isgenerator(val) or 
+        (hasattr(val, "__iter__") and hasattr(val, "__next__") and not isinstance(val, (str, bytes)))):
+        return "list(" + repr(list(val)) + ")"
+    return repr(val)
+
+try:
+    _res = _get_repr(eval(${JSON.stringify(cleanExpr)}))
+finally:
+    # Cleanup to avoid polluting global namespace too much, 
+    # though eval() might have side effects.
+    pass
+_res
+`.trim();
+      const r = await py.runPythonAsync(pyCode);
+      return { ok: true, repr: r };
+    } catch (e) {
+      return { ok: false, err: String(e.message || e).split("\n").filter(Boolean).pop() };
+    }
+  }
+
+  async function checkWord(w, { quiet = false } = {}) {
+    if (!pyReady || !isFilled(w)) return;
+    const typed = readWord(w);
+    let correct = false, info = "";
+
+    if (window.CHECK_MODE === "literal") {
+      correct = typed === w.answer;
+      info = correct ? `${w.clue} = ${typed}` : `${typed} ? ${w.answer}`;
+    } else {
+      const got = await evalRepr(typed, w.init);
+      const want = await evalRepr(w.answer, w.init);
+      if (!got.ok) { info = "? " + got.err; }
+      else if (!want.ok) { info = "? bad answer key: " + want.err; }
+      else { 
+        correct = got.repr === want.repr; 
+        let displayRepr = got.repr;
+        if (displayRepr.startsWith("list(") && displayRepr.endsWith(")")) {
+            displayRepr = displayRepr.substring(5, displayRepr.length - 1);
+        }
+        info = `eval(${typed}) ? ${displayRepr}`; 
+      }
+    }
+
+    paintWord(w, correct);
+    if (correct) solved.add(w.id); else solved.delete(w.id);
+    document.querySelector(`.clue[data-id="${w.id}"]`)?.classList.toggle("solved", correct);
+
+    if (!quiet) setStatus((correct ? "? " : "? ") + info, correct ? "ok" : "err");
+    updateProgress();
+    return correct;
+  }
+
+  function paintWord(w, correct) {
+    w.cells.forEach(([r, c]) => {
+      const el = cellEl(r, c); if (!el) return;
+      el.classList.remove("correct", "error");
+      el.classList.add(correct ? "correct" : "error");
+    });
+  }
+
+  async function checkCellWords(r, c) {
+    const cw = cellWords[key(r, c)]; if (!cw) return;
+    for (const d of ["A", "D"]) {
+      if (!cw[d]) continue;
+      const w = words.find(x => x.id === cw[d]);
+      if (w && isFilled(w)) await checkWord(w);
+      else if (w) clearPaint(w);
+    }
+  }
+  function clearPaint(w) {
+    w.cells.forEach(([r, c]) =>
+      cellEl(r, c)?.classList.remove("correct", "error"));
+  }
+
+  async function checkAll() {
+    const t = TRANSLATIONS[window.LANG];
+    if (!pyReady) return setStatus(t.loadingCrossword, "err");
+    for (const w of words) if (isFilled(w)) await checkWord(w, { quiet: true });
+    setStatus(`${t.checked} ${solved.size}/${words.length} ${t.solved}.`,
+      solved.size === words.length ? "ok" : "");
+  }
+
+  function revealCell() {
+    const w = activeWord(); if (!w || !active) return;
+    const idx = w.cells.findIndex(([r, c]) => r === active[0] && c === active[1]);
+    const ch = w.answer[idx];
+    if (ch === undefined) return;
+    letters[key(active[0], active[1])] = ch;
+    const i = inputEl(active[0], active[1]); if (i) i.value = ch;
+    checkCellWords(active[0], active[1]);
+    saveState();
+  }
+
+  function clearAll() {
+    const t = TRANSLATIONS[window.LANG];
+    letters = {}; solved = new Set();
+    document.querySelectorAll(".cell input").forEach(i => i.value = "");
+    document.querySelectorAll(".cell").forEach(el =>
+      el.classList.remove("correct", "error"));
+    document.querySelectorAll(".clue").forEach(el => el.classList.remove("solved"));
+    updateProgress(); setStatus(t.cleared, "");
+    saveState();
+  }
+
+  function updateProgress() {
+    const t = TRANSLATIONS[window.LANG];
+    document.getElementById("progress").textContent =
+      `${solved.size} / ${words.length} ${t.solved}`;
+    if (words.length && solved.size === words.length)
+      setStatus(t.solvedAll, "ok");
+  }
+  function setStatus(msg, cls) {
+    const el = document.getElementById("status");
+    el.textContent = msg; el.className = "status " + (cls || "");
+  }
+
+  // ---- playground ------------------------------------------------------
+  async function runPlayground() {
+    const t = TRANSLATIONS[window.LANG];
+    const inp = document.getElementById("pg-in");
+    const out = document.getElementById("pg-out");
+    const code = inp.value.trim();
+    if (!code) return;
+    const w = activeWord();
+    if (!w) return;
+    if (!pyReady) { out.textContent = t.loadingCrossword; return; }
+    const initCode = w ? (w.init || "") : "";
+    const res = await evalRepr(code, initCode);
+    let msg = res.ok ? "? " + res.repr : "? " + res.err;
+    if (w && w.init) msg = `(init: ${w.init}) ` + msg;
+    out.textContent = msg;
+  }
+
+  // ---- bootstrap -------------------------------------------------------
+  async function loadPy() {
+    const t = TRANSLATIONS[window.LANG];
+    const s = document.createElement("script");
+    s.src = cfg.pyodideScript;
+    document.head.appendChild(s);
+    await new Promise((res, rej) => { s.onload = res; s.onerror = rej; });
+    py = await loadPyodide({ indexURL: cfg.pyodideUrl });
+    pyReady = true;
+    document.getElementById("boot").style.display = "none";
+    setStatus(t.ready, "ok");
+    await checkAll();
+  }
+
+  function init() {
+    applyTranslations();
+    parse(window.PUZZLE);
+    render();
+    loadState();
+    updateProgress();
+    document.getElementById("btn-check").onclick = checkAll;
+    document.getElementById("btn-reveal").onclick = revealCell;
+    document.getElementById("btn-clear").onclick = clearAll;
+    document.getElementById("pg-run").onclick = runPlayground;
+    document.getElementById("pg-in").addEventListener("keydown",
+      e => { if (e.key === "Enter") runPlayground(); });
+    loadPy().catch(e => {
+      const t = TRANSLATIONS[window.LANG];
+      document.getElementById("boot").textContent = t.failed + e;
+    });
+    // expose for debugging
+    window.crossword = { words, get state(){ return { letters, solved:[...solved] }; }, checkAll };
+  }
+
+  return { init };
+})();
+
+document.addEventListener("DOMContentLoaded", Engine.init);
+</script>
+</body>
+</html>

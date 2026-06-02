@@ -168,6 +168,32 @@
   @media (prefers-color-scheme: dark) {
     .boot { background: rgba(22, 22, 26, 0.85); }
   }
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0, 0, 0, 0.5);
+    display: none; align-items: center; justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    border: 2px solid var(--accent);
+    animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes modal-in {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal h2 { margin-bottom: 1rem; color: var(--accent); }
+  .modal p { margin-bottom: 1.5rem; font-size: 1.1rem; }
+  .modal button { font-size: 1rem; padding: 8px 24px; background: var(--accent); color: white; border: none; }
+  .modal button:hover { opacity: 0.9; }
   .spinner {
     width: 40px; height: 40px;
     border: 4px solid var(--line);
@@ -185,7 +211,7 @@
     <button onclick="setLang('lt')">LT</button>
     <button onclick="setLang('en')">EN</button>
   </div>
-  <h1 id="ui-title">?? Python Crossword</h1>
+  <h1 id="ui-title">Python Crossword</h1>
   <p class="tagline" id="ui-tagline">every clue is <code>eval(answer)</code> in Python</p>
 </header>
 
@@ -211,6 +237,14 @@
         <button id="pg-run" disabled>Run</button>
       </div>
       <div class="pg-out" id="pg-out"></div>
+    </div>
+  </div>
+
+  <div id="modal-solved" class="modal-overlay">
+    <div class="modal">
+      <h2 id="modal-title">Sveikiname!</h2>
+      <p id="modal-message">Išsprendėte visą kryžiažodį!</p>
+      <button id="modal-close">Puiku</button>
     </div>
   </div>
 
@@ -344,13 +378,15 @@ const Engine = (() => {
       across: "Horizontaliai",
       down: "Vertikaliai",
       solved: "išspręsta",
-      solvedAll: "?? Išsprendėte visą kryžiažodį!",
+      solvedAll: "Išsprendėte visą kryžiažodį!",
       typing: "Rašote:",
       checked: "Patikrinta.",
       cleared: "Išvalyta.",
       ready: "Kryžiažodis paruoštas.",
       failed: "Nepavyko užkrauti: ",
-      loadingCrossword: "Kraunamas kryžiažodis..."
+      loadingCrossword: "Kraunamas kryžiažodis...",
+      congrats: "Sveikiname!",
+      close: "Puiku"
     },
     en: {
       title: "Python Crossword",
@@ -372,7 +408,9 @@ const Engine = (() => {
       cleared: "Cleared.",
       ready: "Crossword ready.",
       failed: "Crossword failed to load: ",
-      loadingCrossword: "? Loading crossword..."
+      loadingCrossword: "? Loading crossword...",
+      congrats: "Congratulations!",
+      close: "Great"
     }
   };
 
@@ -399,6 +437,9 @@ const Engine = (() => {
     document.getElementById("pg-run").textContent = t.pgRun;
     document.getElementById("ui-across").textContent = t.across;
     document.getElementById("ui-down").textContent = t.down;
+    document.getElementById("modal-title").textContent = t.congrats;
+    document.getElementById("modal-message").textContent = t.solvedAll;
+    document.getElementById("modal-close").textContent = t.close;
     if (!active) document.getElementById("dir-indicator").textContent = t.clickToStart;
   }
 
@@ -825,10 +866,17 @@ _res
 
   function updateProgress() {
     const t = TRANSLATIONS[window.LANG];
-    document.getElementById("progress").textContent =
-      `${solved.size} / ${words.length} ${t.solved}`;
-    if (words.length && solved.size === words.length)
+    const progressEl = document.getElementById("progress");
+    if (progressEl) {
+      progressEl.textContent = `${solved.size} / ${words.length} ${t.solved}`;
+    }
+    if (words.length && solved.size === words.length) {
       setStatus(t.solvedAll, "ok");
+      const modal = document.getElementById("modal-solved");
+      if (modal && !modal.classList.contains("show")) {
+        modal.classList.add("show");
+      }
+    }
   }
   function setStatus(msg, cls) {
     const el = document.getElementById("status");
@@ -867,6 +915,12 @@ _res
   }
 
   function init() {
+    const params = new URLSearchParams(window.location.search);
+    const langParam = params.get("language");
+    if (langParam && langParam.toUpperCase() === "EN") {
+      window.LANG = "en";
+    }
+
     applyTranslations();
     parse(window.PUZZLE);
     render();
@@ -875,6 +929,9 @@ _res
     document.getElementById("btn-check").onclick = checkAll;
     document.getElementById("btn-reveal").onclick = revealCell;
     document.getElementById("btn-clear").onclick = clearAll;
+    document.getElementById("modal-close").onclick = () => {
+      document.getElementById("modal-solved").classList.remove("show");
+    };
     document.getElementById("pg-run").onclick = runPlayground;
     document.getElementById("pg-in").addEventListener("keydown",
       e => { if (e.key === "Enter") runPlayground(); });

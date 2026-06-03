@@ -349,6 +349,8 @@ window.PUZZLE = {
     ]
   }
 };
+
+
 </script>
 
 <!-- ===================================================================== -->
@@ -458,8 +460,12 @@ const Engine = (() => {
   const isBlock = (r, c) => !(grid[r] && grid[r][c]);
 
   const STORAGE_KEY = "crossword_state";
+  function getPuzzleHash() {
+    return btoa(JSON.stringify(window.PUZZLE.grid));
+  }
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      hash: getPuzzleHash(),
       letters,
       solved: Array.from(solved)
     }));
@@ -470,6 +476,7 @@ const Engine = (() => {
     if (!saved) return;
     try {
       const state = JSON.parse(saved);
+      if (state.hash !== getPuzzleHash()) return;
       letters = state.letters || {};
       solved = new Set(state.solved || []);
       
@@ -763,6 +770,9 @@ def _get_repr(val):
     if (inspect.isgenerator(val) or 
         (hasattr(val, "__iter__") and hasattr(val, "__next__") and not isinstance(val, (str, bytes)))):
         return "list(" + repr(list(val)) + ")"
+    if hasattr(val, "__class__") and not isinstance(val, (int, float, str, list, dict, set, tuple, bool, type(None))):
+        # For custom objects, use class name instead of default repr which includes memory address
+        return f"<{val.__class__.__module__}.{val.__class__.__name__} object>"
     return repr(val)
 
 try:
@@ -838,8 +848,9 @@ _res
     const t = TRANSLATIONS[window.LANG];
     if (!pyReady) return setStatus(t.loadingCrossword, "err");
     for (const w of words) if (isFilled(w)) await checkWord(w, { quiet: true });
-    setStatus(`${t.checked} ${solved.size}/${words.length} ${t.solved}.`,
-      solved.size === words.length ? "ok" : "");
+    const correctCount = words.filter(w => solved.has(w.id) && isFilled(w)).length;
+    setStatus(`${t.checked} ${correctCount}/${words.length} ${t.solved}.`,
+      correctCount === words.length ? "ok" : "");
   }
 
   function revealCell() {
@@ -867,10 +878,12 @@ _res
   function updateProgress() {
     const t = TRANSLATIONS[window.LANG];
     const progressEl = document.getElementById("progress");
+    const correctCount = words.filter(w => solved.has(w.id) && isFilled(w)).length;
     if (progressEl) {
-      progressEl.textContent = `${solved.size} / ${words.length} ${t.solved}`;
+      progressEl.textContent = `${correctCount} / ${words.length} ${t.solved}`;
     }
-    if (words.length && solved.size === words.length) {
+    const allFilled = words.every(w => isFilled(w));
+    if (words.length && correctCount === words.length && allFilled) {
       setStatus(t.solvedAll, "ok");
       const modal = document.getElementById("modal-solved");
       if (modal && !modal.classList.contains("show")) {

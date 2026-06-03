@@ -287,7 +287,7 @@
  */
 
 window.CHECK_MODE = "value";   // "value"  (eval-equivalent)  |  "literal"
-
+/*
 window.PUZZLE = {
   grid: [
     "##########.###########",
@@ -349,6 +349,270 @@ window.PUZZLE = {
     ]
   }
 };
+*/
+
+window.PUZZLE = {
+  "grid": [
+    "###########........###",
+    "##.#############.#####",
+    "##.#...###............",
+    "##.#.###########.#####",
+    ".......##..........##.",
+    ".#.#.########.##.####.",
+    ".#.#..............###.",
+    ".#.#.########.##.####.",
+    ".#.#.####.###.#######.",
+    ".###.###...........##.",
+    ".#.######.###.#######.",
+    "#...................#.",
+    ".#.######.###.#######.",
+    ".#.######.###.#####.#.",
+    ".#.###...........##.#.",
+    ".#.######.###.#####.#.",
+    "..................#.#.",
+    ".#.######.###.#####.#.",
+    ".#.######.#########.#.",
+    "##.####...............",
+    "##.######.#########.##",
+    "###.......##........##"
+  ],
+  "clues": {
+    "across": [
+      {
+        "row": 0,
+        "col": 11,
+        "clue_lt": "Gauk pirmas DataFrame d eilutes.",
+        "clue_en": "Get the first rows of DataFrame d.",
+        "answer": "d.head()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2,3]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 2,
+        "col": 4,
+        "clue_lt": "Transponuok DataFrame d.",
+        "clue_en": "Transpose DataFrame d.",
+        "answer": "d.T",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 2,
+        "col": 10,
+        "clue_lt": "Sukurk pandas Series iš x.",
+        "clue_en": "Create a pandas Series from x.",
+        "answer": "pd.Series(x)",
+        "init": "import pandas as pd;x=[1,2,3]",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 4,
+        "col": 0,
+        "clue_lt": "Apskaičiuok DataFrame d stulpelių sumas.",
+        "clue_en": "Calculate column sums of DataFrame d.",
+        "answer": "d.sum()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 4,
+        "col": 9,
+        "clue_lt": "Apskaičiuok DataFrame d medianas.",
+        "clue_en": "Calculate medians of DataFrame d.",
+        "answer": "d.median()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2,3]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 6,
+        "col": 4,
+        "clue_lt": "Surikiuok DataFrame d pagal indeksą.",
+        "clue_en": "Sort DataFrame d by index.",
+        "answer": "d.sort_index()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2]},index=[2,1])",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 9,
+        "col": 8,
+        "clue_lt": "Užpildyk trūkstamas DataFrame d reikšmes nuliais.",
+        "clue_en": "Fill missing values in DataFrame d with zeros.",
+        "answer": "d.fillna(0)",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,None]})",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 11,
+        "col": 1,
+        "clue_lt": "Pašalink pasikartojančias DataFrame d eilutes.",
+        "clue_en": "Drop duplicate rows from DataFrame d.",
+        "answer": "d.drop_duplicates()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,1]})",
+        "topic": "pandas",
+        "difficulty": 4
+      },
+      {
+        "row": 14,
+        "col": 6,
+        "clue_lt": "Gauk Series s tekstų ilgius.",
+        "clue_en": "Get lengths of strings in Series s.",
+        "answer": "s.str.len()",
+        "init": "import pandas as pd;s=pd.Series(['ab','c'])",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 16,
+        "col": 0,
+        "clue_lt": "Surikiuok DataFrame d pagal stulpelį 'a'.",
+        "clue_en": "Sort DataFrame d by column 'a'.",
+        "answer": "d.sort_values('a')",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[2,1]})",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 19,
+        "col": 7,
+        "clue_lt": "Sukurk pandas DataFrame iš x.",
+        "clue_en": "Create a pandas DataFrame from x.",
+        "answer": "pd.DataFrame(x)",
+        "init": "import pandas as pd;x={'a':[1,2]}",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 21,
+        "col": 3,
+        "clue_lt": "Rask DataFrame d stulpelių minimumus.",
+        "clue_en": "Find column minimums of DataFrame d.",
+        "answer": "d.min()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 21,
+        "col": 12,
+        "clue_lt": "Gauk paskutines DataFrame d eilutes.",
+        "clue_en": "Get the last rows of DataFrame d.",
+        "answer": "d.tail()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2,3]})",
+        "topic": "pandas",
+        "difficulty": 2
+      }
+    ],
+    "down": [
+      {
+        "row": 0,
+        "col": 16,
+        "clue_lt": "Patikrink, kurios DataFrame d reikšmės yra trūkstamos.",
+        "clue_en": "Check which values in DataFrame d are missing.",
+        "answer": "d.isna()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,None]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 1,
+        "col": 2,
+        "clue_lt": "Patikrink, kurios Series s reikšmės yra trūkstamos.",
+        "clue_en": "Check which values in Series s are missing.",
+        "answer": "s.isna()",
+        "init": "import pandas as pd;s=pd.Series([1,None])",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 2,
+        "col": 4,
+        "clue_lt": "Apskaičiuok DataFrame d modas.",
+        "clue_en": "Calculate modes of DataFrame d.",
+        "answer": "d.mode()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,1,2]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 4,
+        "col": 0,
+        "clue_lt": "Gauk DataFrame d formą.",
+        "clue_en": "Get the shape of DataFrame d.",
+        "answer": "d.shape",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 4,
+        "col": 13,
+        "clue_lt": "Patikrink, kurios DataFrame d eilutės dubliuojasi.",
+        "clue_en": "Check which rows of DataFrame d are duplicated.",
+        "answer": "d.duplicated()",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,1]})",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 4,
+        "col": 21,
+        "clue_lt": "Nuskaityk Excel failą f į pandas objektą.",
+        "clue_en": "Read Excel file f into a pandas object.",
+        "answer": "pd.read_excel(f)",
+        "init": "import pandas as pd;import openpyxl;f='data.xlsx';pd.DataFrame({'a':[1]}).to_excel(f)",
+        "topic": "pandas",
+        "difficulty": 4
+      },
+      {
+        "row": 8,
+        "col": 9,
+        "clue_lt": "Apskaičiuok DataFrame d 0.5 kvantilį.",
+        "clue_en": "Calculate the 0.5 quantile of DataFrame d.",
+        "answer": "d.quantile(.5)",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2,3]})",
+        "topic": "pandas",
+        "difficulty": 4
+      },
+      {
+        "row": 10,
+        "col": 2,
+        "clue_lt": "Įrašyk DataFrame d į CSV failą f.",
+        "clue_en": "Write DataFrame d to CSV file f.",
+        "answer": "d.to_csv(f)",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1]});f='out.csv'",
+        "topic": "pandas",
+        "difficulty": 3
+      },
+      {
+        "row": 12,
+        "col": 0,
+        "clue_lt": "Gauk DataFrame d indeksą.",
+        "clue_en": "Get the index of DataFrame d.",
+        "answer": "d.index",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1,2]})",
+        "topic": "pandas",
+        "difficulty": 2
+      },
+      {
+        "row": 13,
+        "col": 19,
+        "clue_lt": "Prijunk DataFrame g prie d pagal indeksą.",
+        "clue_en": "Join DataFrame g to d by index.",
+        "answer": "d.join(g)",
+        "init": "import pandas as pd;d=pd.DataFrame({'a':[1]});g=pd.DataFrame({'b':[2]})",
+        "topic": "pandas",
+        "difficulty": 3
+      }
+    ]
+  }
+};
 </script>
 
 <!-- ===================================================================== -->
@@ -359,8 +623,8 @@ window.PUZZLE = {
 
 const Engine = (() => {
   const cfg = {
-    pyodideUrl: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/",
-    pyodideScript: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js",
+    pyodideUrl: "https://cdn.jsdelivr.net/pyodide/v0.29.4/full/",
+    pyodideScript: "https://cdn.jsdelivr.net/pyodide/v0.29.4/full/pyodide.js",
   };
 
   const TRANSLATIONS = {
@@ -385,6 +649,7 @@ const Engine = (() => {
       ready: "Kryžiažodis paruoštas.",
       failed: "Nepavyko užkrauti: ",
       loadingCrossword: "Kraunamas kryžiažodis...",
+      loadingPackage: "Kraunamas modulis: ",
       congrats: "Sveikiname!",
       close: "Puiku"
     },
@@ -409,6 +674,7 @@ const Engine = (() => {
       ready: "Crossword ready.",
       failed: "Crossword failed to load: ",
       loadingCrossword: "? Loading crossword...",
+      loadingPackage: "Loading module: ",
       congrats: "Congratulations!",
       close: "Great"
     }
@@ -458,8 +724,12 @@ const Engine = (() => {
   const isBlock = (r, c) => !(grid[r] && grid[r][c]);
 
   const STORAGE_KEY = "crossword_state";
+  function getPuzzleHash() {
+    return btoa(JSON.stringify(window.PUZZLE.grid));
+  }
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      hash: getPuzzleHash(),
       letters,
       solved: Array.from(solved)
     }));
@@ -470,6 +740,7 @@ const Engine = (() => {
     if (!saved) return;
     try {
       const state = JSON.parse(saved);
+      if (state.hash !== getPuzzleHash()) return;
       letters = state.letters || {};
       solved = new Set(state.solved || []);
       
@@ -747,8 +1018,39 @@ const Engine = (() => {
   }
 
   async function evalRepr(expr, initCode = "") {
+    const boot = document.getElementById("boot");
+    const t = TRANSLATIONS[window.LANG];
     try {
       if (initCode) {
+        // Dynamically load packages if needed
+        const imports = initCode.match(/(?:from|import)\s+([a-zA-Z0-9_]+)/g);
+        if (imports) {
+          const packages = [...new Set(imports.map(i => i.split(/\s+/)[1]))];
+          let showingBoot = false;
+          for (const pkg of packages) {
+            // Some modules are built-in or already loaded, but pyodide.loadPackage is idempotent
+            // and handles micropip/micropip-compatible packages.
+            try {
+              const alreadyLoaded = py.loadedPackages && py.loadedPackages[pkg];
+              if (!alreadyLoaded) {
+                if (!showingBoot) {
+                  boot.style.display = "flex";
+                  showingBoot = true;
+                }
+                boot.textContent = t.loadingPackage + pkg;
+                try {
+                    await py.loadPackage(pkg);
+                } catch (e) {
+                    // Fallback to micropip for packages not in the main repository
+                    await py.loadPackage("micropip");
+                    await py.runPythonAsync(`import micropip; await micropip.install("${pkg}")`);
+                }
+              }
+            } catch (e) {
+              console.warn("Failed to load package:", pkg, e);
+            }
+          }
+        }
         await py.runPythonAsync(initCode);
       }
       // Wrap starred expressions like "*map(print,L)," into parentheses "(*map(print,L),)"
@@ -763,6 +1065,9 @@ def _get_repr(val):
     if (inspect.isgenerator(val) or 
         (hasattr(val, "__iter__") and hasattr(val, "__next__") and not isinstance(val, (str, bytes)))):
         return "list(" + repr(list(val)) + ")"
+    if hasattr(val, "__class__") and not isinstance(val, (int, float, str, list, dict, set, tuple, bool, type(None))):
+        # For custom objects, use class name instead of default repr which includes memory address
+        return f"<{val.__class__.__module__}.{val.__class__.__name__} object>"
     return repr(val)
 
 try:
@@ -777,6 +1082,8 @@ _res
       return { ok: true, repr: r };
     } catch (e) {
       return { ok: false, err: String(e.message || e).split("\n").filter(Boolean).pop() };
+    } finally {
+      boot.style.display = "none";
     }
   }
 
@@ -838,8 +1145,9 @@ _res
     const t = TRANSLATIONS[window.LANG];
     if (!pyReady) return setStatus(t.loadingCrossword, "err");
     for (const w of words) if (isFilled(w)) await checkWord(w, { quiet: true });
-    setStatus(`${t.checked} ${solved.size}/${words.length} ${t.solved}.`,
-      solved.size === words.length ? "ok" : "");
+    const correctCount = words.filter(w => solved.has(w.id) && isFilled(w)).length;
+    setStatus(`${t.checked} ${correctCount}/${words.length} ${t.solved}.`,
+      correctCount === words.length ? "ok" : "");
   }
 
   function revealCell() {
@@ -867,10 +1175,12 @@ _res
   function updateProgress() {
     const t = TRANSLATIONS[window.LANG];
     const progressEl = document.getElementById("progress");
+    const correctCount = words.filter(w => solved.has(w.id) && isFilled(w)).length;
     if (progressEl) {
-      progressEl.textContent = `${solved.size} / ${words.length} ${t.solved}`;
+      progressEl.textContent = `${correctCount} / ${words.length} ${t.solved}`;
     }
-    if (words.length && solved.size === words.length) {
+    const allFilled = words.every(w => isFilled(w));
+    if (words.length && correctCount === words.length && allFilled) {
       setStatus(t.solvedAll, "ok");
       const modal = document.getElementById("modal-solved");
       if (modal && !modal.classList.contains("show")) {

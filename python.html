@@ -352,256 +352,334 @@ window.PUZZLE = {
 */
 
 window.PUZZLE = {
-  grid: [
-    "###.#.............##",
-    "###.############.###",
-    "##.........#.###.###",
-    "###.#######.......##",
-    "###.########.###.#.#",
-    "#.........##.###.#.#",
-    "#.#.########.###.#.#",
-    "#.#................#",
-    "#.#.####.###.###.###",
-    "#.###.#............#",
-    "#####.##.###.###.###",
-    "#.#..............#.#",
-    "#.###.##.###.#####.#",
-    "#.###.##.##.........",
-    "#.###.##.###.###.#.#",
-    "#.###.##.###.###.#.#",
-    "...........#........",
-    "#.###.##.###.###.#.#",
-    "#####.##.###.###.###",
-    "......###....###.###"
+  "grid": [
+    "#########.##########",
+    "#######.#.#########.",
+    "#####.#.#.#####.#.#.",
+    ".####.#.#.##.##.#...",
+    ".#.##.#.#.##.##.#.#.",
+    ".#.##.#.#.##.##.###.",
+    ".#.#................",
+    "....#.###.##.####.##",
+    ".#.##.#....#.####.##",
+    ".#.##.######.##.#.##",
+    "##................##",
+    "#####.######.##.####",
+    "#####.#.##.#.##.#.#.",
+    "##.........#.##.#...",
+    ".####.#.##.#.##.#.#.",
+    ".####.#.##.#.##.###.",
+    ".##............####.",
+    ".##.######.########.",
+    "......#.............",
+    "###.######.#########"
   ],
-  clues: {
-    across: [
+  "clues": {
+    "across": [
       {
-        row: 0,
-        col: 5,
-        clue_lt: "Gauk išmokyto PCA objekto p komponentes.",
-        clue_en: "Get the components of fitted PCA object p.",
-        answer: "p.components_",
-        init: "from sklearn.decomposition import PCA\nX=[[1,2],[3,4],[5,6]];p=PCA(1).fit(X)",
-        topic: "ml_dimensionality",
-        difficulty: 3
+        "row": 3,
+        "col": 17,
+        "clue_lt": "Gauk n-1 naudodamas bitinio neigimo triuką.",
+        "clue_en": "Get n-1 using the bitwise-negation trick.",
+        "answer": "~-n",
+        "init": "n=7",
+        "topic": "golf_arithmetic",
+        "difficulty": 2,
+        "source_tip": "incrementing_decrementing"
       },
       {
-        row: 2,
-        col: 2,
-        clue_lt: "Paversk NumPy masyvą X į vienmatį masyvą.",
-        clue_en: "Flatten NumPy array X into a one-dimensional array.",
-        answer: "X.ravel()",
-        init: "import numpy as np;X=np.array([[1,2]])",
-        topic: "ml_numpy",
-        difficulty: 2
+        "row": 6,
+        "col": 4,
+        "clue_lt": "Išvesk x tik tada, kai f(x)>1, naudodamas == short-circuit triuką.",
+        "clue_en": "Print x only when f(x)>1 using the == short-circuit trick.",
+        "answer": "f(x)>1==print(x)",
+        "init": "f=lambda x:x;x=2",
+        "topic": "golf_short_circuit",
+        "difficulty": 4,
+        "source_tip": "short_circuit_eq"
       },
       {
-        row: 3,
-        col: 11,
-        clue_lt: "Gauk išmokyto tiesinės regresijos modelio m koeficientus.",
-        clue_en: "Get the coefficients of trained linear regression model m.",
-        answer: "m.coef_",
-        init: "from sklearn.linear_model import LinearRegression\nX=[[1],[2]];y=[1,2];m=LinearRegression().fit(X,y)",
-        topic: "ml_models",
-        difficulty: 3
+        "row": 7,
+        "col": 0,
+        "clue_lt": "Paversk žodyno d raktus į sąrašą splat būdu.",
+        "clue_en": "Convert dictionary d keys to a list using splat syntax.",
+        "answer": "[*d]",
+        "init": "d={'a':1,'b':2}",
+        "topic": "golf_splat",
+        "difficulty": 2,
+        "source_tip": "splat_on_iterables"
       },
       {
-        row: 5,
-        col: 1,
-        clue_lt: "Sukurk scikit-learn KMeans modelį su 3 klasteriais.",
-        clue_en: "Create a scikit-learn KMeans model with 3 clusters.",
-        answer: "KMeans(3)",
-        init: "from sklearn.cluster import KMeans",
-        topic: "ml_clustering",
-        difficulty: 3
+        "row": 8,
+        "col": 7,
+        "clue_lt": "Gauk pirmą bytes objekto b reikšmę kaip sveikąjį skaičių.",
+        "clue_en": "Get the first value of bytes object b as an integer.",
+        "answer": "b[0]",
+        "init": "b=b'abc'",
+        "topic": "golf_bytes",
+        "difficulty": 1,
+        "source_tip": "byte_strings_integer_lists"
       },
       {
-        row: 7,
-        col: 3,
-        clue_lt: "NumPy masyve X pakeisk NaN reikšmes skaičiais.",
-        clue_en: "Replace NaN values with numbers in NumPy array X.",
-        answer: "np.nan_to_num(X)",
-        init: "import numpy as np;X=np.array([1,np.nan])",
-        topic: "ml_numpy",
-        difficulty: 2
+        "row": 10,
+        "col": 2,
+        "clue_lt": "Išvesk x, kai x priklauso L, naudodamas == short-circuit triuką.",
+        "clue_en": "Print x when x belongs to L using the == short-circuit trick.",
+        "answer": "x in L==print(x)",
+        "init": "x=2;L=[1,2]",
+        "topic": "golf_short_circuit",
+        "difficulty": 5,
+        "source_tip": "short_circuit_eq"
       },
       {
-        row: 9,
-        col: 7,
-        clue_lt: "Apskaičiuok išmokyto scikit-learn modelio m įvertį pagal požymių matricą X ir tikslus y.",
-        clue_en: "Calculate the score of trained scikit-learn model m using feature matrix X and targets y.",
-        answer: "m.score(X,y)",
-        init: "from sklearn.linear_model import LinearRegression\nX=[[1],[2]];y=[1,2];m=LinearRegression().fit(X,y)",
-        topic: "ml_models",
-        difficulty: 2
+        "row": 13,
+        "col": 2,
+        "clue_lt": "Įterpk b į sąrašą a ties indeksu i naudodamas slice triuką.",
+        "clue_en": "Insert b into list a at index i using a slicing trick.",
+        "answer": "a[:i]+=b,",
+        "init": "a=[1,3];b=2;i=1",
+        "topic": "golf_lists",
+        "difficulty": 3,
+        "source_tip": "appending_to_list"
       },
       {
-        row: 11,
-        col: 3,
-        clue_lt: "Suskaičiuok sveikaisiais skaičiais užkoduotų klasių y dažnius naudojant numpy(np).",
-        clue_en: "Count frequencies of integer-encoded classes y by using numpy(np).",
-        answer: "np.bincount(y)",
-        init: "import numpy as np;y=[0,1,1]",
-        topic: "ml_numpy",
-        difficulty: 2
+        "row": 13,
+        "col": 17,
+        "clue_lt": "Sumažink x vienetu naudodamas ~- triuką.",
+        "clue_en": "Decrement x by one using the ~- trick.",
+        "answer": "~-x",
+        "init": "x=5",
+        "topic": "golf_arithmetic",
+        "difficulty": 2,
+        "source_tip": "incrementing_decrementing"
       },
       {
-        row: 13,
-        col: 11,
-        clue_lt: "Apskaičiuok pandas DataFrame df koreliacijų matricą.",
-        clue_en: "Calculate the correlation matrix of pandas DataFrame df.",
-        answer: "df.corr()",
-        init: "import pandas as pd;df=pd.DataFrame({'a':[1,2],'b':[2,4]})",
-        topic: "ml_pandas",
-        difficulty: 2
+        "row": 16,
+        "col": 3,
+        "clue_lt": "Įterpk sąrašo L elementus tarp 1,2 ir 3,4.",
+        "clue_en": "Insert elements of list L between 1,2 and 3,4.",
+        "answer": "[1,2,*L,3,4]",
+        "init": "L=[9,8]",
+        "topic": "golf_splat",
+        "difficulty": 2,
+        "source_tip": "splat_on_iterables"
       },
       {
-        row: 16,
-        col: 0,
-        clue_lt: "Patikrink, kurios NumPy masyvo X reikšmės yra NaN.",
-        clue_en: "Check which values in NumPy array X are NaN.",
-        answer: "np.isnan(X)",
-        init: "import numpy as np;X=np.array([1,np.nan])",
-        topic: "ml_numpy",
-        difficulty: 2
+        "row": 18,
+        "col": 0,
+        "clue_lt": "Paimk pirmą sąrašo L elementą į x ir likutį palik L.",
+        "clue_en": "Take first element of list L into x and keep the rest in L.",
+        "answer": "x,*L=L",
+        "init": "L=[1,2,3]",
+        "topic": "golf_unpacking",
+        "difficulty": 3,
+        "source_tip": "unpacking_assignment"
       },
       {
-        row: 16,
-        col: 12,
-        clue_lt: "Apskaičiuok vidutinę kvadratinę paklaidą pagal tikras reikšmes y ir prognozes p.",
-        clue_en: "Calculate mean squared error from true values y and predictions p.",
-        answer: "mse(y,p)",
-        init: "from sklearn.metrics import mean_squared_error as mse\ny=[1,2];p=[1,3]",
-        topic: "ml_metrics",
-        difficulty: 2
-      },
-      {
-        row: 19,
-        col: 0,
-        clue_lt: "Sukurk scikit-learn PCA transformatorių su 2 komponentėmis.",
-        clue_en: "Create a scikit-learn PCA transformer with 2 components.",
-        answer: "PCA(2)",
-        init: "from sklearn.decomposition import PCA",
-        topic: "ml_dimensionality",
-        difficulty: 3
-      },
-      {
-        row: 19,
-        col: 9,
-        clue_lt: "Sukurk scikit-learn StandardScaler objektą, naudodamas alias SS.",
-        clue_en: "Create a scikit-learn StandardScaler object using alias SS.",
-        answer: "SS()",
-        init: "from sklearn.preprocessing import StandardScaler as SS",
-        topic: "ml_preprocessing",
-        difficulty: 2
+        "row": 18,
+        "col": 7,
+        "clue_lt": "Išvesk x tik jei jis teigiamas, naudodamas short-circuit ir print.",
+        "clue_en": "Print x only if it is positive using short-circuit and print.",
+        "answer": "x>0==print(x)",
+        "init": "x=5",
+        "topic": "golf_printing",
+        "difficulty": 4,
+        "source_tip": "short_circuit_eq"
       }
     ],
-    down: [
+    "down": [
       {
-        row: 0,
-        col: 3,
-        clue_lt: "Sukurk NumPy vienetinę matricą, kurios dydis n.",
-        clue_en: "Create a NumPy identity matrix of size n.",
-        answer: "np.eye(n)",
-        init: "import numpy as np;n=3",
-        topic: "ml_numpy",
-        difficulty: 2
+        "row": 0,
+        "col": 9,
+        "clue_lt": "Begalinio ciklo antraštė argumentų pop triukui.",
+        "clue_en": "Infinite loop header for the argv pop trick.",
+        "answer": "while 1:0",
+        "init": "",
+        "check": "ast",
+        "topic": "golf_argv",
+        "difficulty": 2,
+        "source_tip": "sys_argv_trick"
       },
       {
-        row: 0,
-        col: 16,
-        clue_lt: "Kartu permaišyk požymių matricą X ir tikslų reikšmes y.",
-        clue_en: "Shuffle feature matrix X and target values y together.",
-        answer: "shuffle(X,y)",
-        init: "from sklearn.utils import shuffle as _s; shuffle=lambda X,y: _s(X,y,random_state=0); X=[1,2,3]; y=[0,1,0]",
-        topic: "ml_validation",
-        difficulty: 2
+        "row": 1,
+        "col": 7,
+        "clue_lt": "Gauk simbolį pagal kodą n.",
+        "clue_en": "Get character from code n.",
+        "answer": "chr(n)",
+        "init": "n=65",
+        "topic": "golf_packers",
+        "difficulty": 2,
+        "source_tip": "3_to_1_packer"
       },
       {
-        row: 2,
-        col: 12,
-        clue_lt: "Išmokyk scikit-learn transformatorių s ir pritaikyk jį požymių matricai X.",
-        clue_en: "Fit scikit-learn transformer s and apply it to feature matrix X.",
-        answer: "s.fit_transform(X)",
-        init: "from sklearn.preprocessing import StandardScaler\nX=[[1],[2]];s=StandardScaler()",
-        topic: "ml_preprocessing",
-        difficulty: 2
+        "row": 1,
+        "col": 19,
+        "clue_lt": "Gauk bytes objekto b ilgį.",
+        "clue_en": "Get the length of bytes object b.",
+        "answer": "len(b)",
+        "init": "b=b'0`!'",
+        "topic": "golf_bytes",
+        "difficulty": 1,
+        "source_tip": "byte_strings_integer_lists"
       },
       {
-        row: 4,
-        col: 18,
-        clue_lt: "Sukurk scikit-learn LabelEncoder objektą, naudodamas alias LE.",
-        clue_en: "Create a scikit-learn LabelEncoder object using alias LE.",
-        answer: "LE()",
-        init: "from sklearn.preprocessing import LabelEncoder as LE",
-        topic: "ml_preprocessing",
-        difficulty: 2
+        "row": 2,
+        "col": 5,
+        "clue_lt": "Išvesk iteratoriaus it elementus atskirose eilutėse.",
+        "clue_en": "Print elements of iterator it on separate lines.",
+        "answer": "*map(print,it),",
+        "init": "it=iter([1,2,3])",
+        "topic": "golf_printing",
+        "difficulty": 2,
+        "source_tip": "print_list_separated_by_newline"
       },
       {
-        row: 5,
-        col: 1,
-        clue_lt: "Sukurk scikit-learn K artimiausių kaimynų klasifikatorių, naudodamas alias KNN.",
-        clue_en: "Create a scikit-learn k-nearest neighbors classifier using alias KNN.",
-        answer: "KNN()",
-        init: "from sklearn.neighbors import KNeighborsClassifier as KNN",
-        topic: "ml_models",
-        difficulty: 2
+        "row": 2,
+        "col": 15,
+        "clue_lt": "Priskirk i ir j tą pačią reikšmę n.",
+        "clue_en": "Assign the same value n to i and j.",
+        "answer": "i=j=n",
+        "init": "n=5",
+        "check": "exec",
+        "topic": "golf_assignment",
+        "difficulty": 1,
+        "source_tip": "multiple_assignment"
       },
       {
-        row: 7,
-        col: 8,
-        clue_lt: "Gauk unikalias tikslų vektoriaus y klasių reikšmes naudojant numpy(np).",
-        clue_en: "Get unique class values from target vector y by using numpy(np).",
-        answer: "np.unique(y)",
-        init: "import numpy as np;y=[0,1,1]",
-        topic: "ml_numpy",
-        difficulty: 2
+        "row": 2,
+        "col": 17,
+        "clue_lt": "Padidink x vienetu naudodamas -~ triuką.",
+        "clue_en": "Increment x by one using the -~ trick.",
+        "answer": "-~x",
+        "init": "x=5",
+        "topic": "golf_arithmetic",
+        "difficulty": 2,
+        "source_tip": "incrementing_decrementing"
       },
       {
-        row: 9,
-        col: 5,
-        clue_lt: "Iš pandas DataFrame df pašalink eilutes su trūkstamomis reikšmėmis.",
-        clue_en: "Drop rows with missing values from pandas DataFrame df.",
-        answer: "df.dropna()",
-        init: "import pandas as pd;df=pd.DataFrame({'a':[1,None]})",
-        topic: "ml_pandas",
-        difficulty: 2
+        "row": 3,
+        "col": 0,
+        "clue_lt": "Pasirink simbolį a arba b pagal loginę reikšmę c.",
+        "clue_en": "Choose character a or b based on boolean c.",
+        "answer": "'ba'[c]",
+        "init": "c=True",
+        "topic": "golf_boolean",
+        "difficulty": 2,
+        "source_tip": "boolean_access"
       },
       {
-        row: 11,
-        col: 1,
-        clue_lt: "Apskaičiuok F1 įvertį pagal tikras klases y ir prognozuotas klases p.",
-        clue_en: "Calculate F1 score from true classes y and predicted classes p.",
-        answer: "f1(y,p)",
-        init: "from sklearn.metrics import f1_score as f1\ny=[1,0];p=[1,1]",
-        topic: "ml_metrics",
-        difficulty: 3
+        "row": 3,
+        "col": 12,
+        "clue_lt": "Išvesk sąrašo L elementus atskirose eilutėse trumpiausiu map triuku.",
+        "clue_en": "Print elements of list L on separate lines using the short map trick.",
+        "answer": "*map(print,L),",
+        "init": "L=[1,2,3]",
+        "topic": "golf_printing",
+        "difficulty": 2,
+        "source_tip": "print_list_separated_by_newline"
       },
       {
-        row: 11,
-        col: 18,
-        clue_lt: "Gauk maišos matricą pagal tikras klases y ir prognozuotas klases p (sklearn).",
-        clue_en: "Get the confusion matrix from true classes y and predicted classes p (sklearn).",
-        answer: "cm(y,p)",
-        init: "from sklearn.metrics import confusion_matrix as cm\ny=[1,0];p=[1,1]",
-        topic: "ml_metrics",
-        difficulty: 2
+        "row": 4,
+        "col": 2,
+        "clue_lt": "Suformatuok sveikąjį x kaip bytes dešimtainį skaičių.",
+        "clue_en": "Format integer x as decimal bytes.",
+        "answer": "b'%d'%x",
+        "init": "x=123",
+        "topic": "golf_bytes_format",
+        "difficulty": 3,
+        "source_tip": "bytes_formatting"
       },
       {
-        row: 13,
-        col: 16,
-        clue_lt: "Apskaičiuok R² įvertį pagal tikras reikšmes y ir prognozes p.",
-        clue_en: "Calculate R-squared score from true values y and predictions p.",
-        answer: "r2(y,p)",
-        init: "from sklearn.metrics import r2_score as r2\ny=[1,2];p=[1,3]",
-        topic: "ml_metrics",
-        difficulty: 2
+        "row": 6,
+        "col": 17,
+        "clue_lt": "Paversk iterable T į tuple trumpu splat būdu.",
+        "clue_en": "Convert iterable T to a tuple using short splat syntax.",
+        "answer": "(*T,)",
+        "init": "T=range(3)",
+        "topic": "golf_splat",
+        "difficulty": 2,
+        "source_tip": "splat_on_iterables"
+      },
+      {
+        "row": 9,
+        "col": 15,
+        "clue_lt": "Priskirk x reikšmę 1 ir iš karto ją perduok funkcijai f.",
+        "clue_en": "Assign x the value 1 and immediately pass it to function f.",
+        "answer": "f(x:=1)",
+        "init": "f=lambda x:x",
+        "topic": "golf_walrus",
+        "difficulty": 3,
+        "source_tip": "walrus_operator"
+      },
+      {
+        "row": 12,
+        "col": 7,
+        "clue_lt": "Pridėk b prie sąrašo a pabaigos trumpiau nei append.",
+        "clue_en": "Append b to list a shorter than append.",
+        "answer": "a+=b,",
+        "init": "a=[1];b=2",
+        "topic": "golf_lists",
+        "difficulty": 2,
+        "source_tip": "appending_to_list"
+      },
+      {
+        "row": 12,
+        "col": 10,
+        "clue_lt": "Paimk pirmą ir paskutinį sąrašo L elementus į a ir b.",
+        "clue_en": "Take first and last elements of list L into a and b.",
+        "answer": "a,*_,b=L",
+        "init": "L=[1,2,3]",
+        "topic": "golf_unpacking",
+        "difficulty": 3,
+        "source_tip": "unpacking_assignment"
+      },
+      {
+        "row": 12,
+        "col": 17,
+        "clue_lt": "Gauk n+1 be pliuso ženklo.",
+        "clue_en": "Get n+1 without a plus sign.",
+        "answer": "-~n",
+        "init": "n=7",
+        "topic": "golf_arithmetic",
+        "difficulty": 2,
+        "source_tip": "incrementing_decrementing"
+      },
+      {
+        "row": 12,
+        "col": 19,
+        "clue_lt": "Įvykdyk išpakuotą kodą iš bytes objekto c.",
+        "clue_en": "Execute unpacked code from bytes object c.",
+        "answer": "exec(c)",
+        "init": "c='x=1'",
+        "topic": "golf_packers",
+        "difficulty": 4,
+        "source_tip": "packers"
+      },
+      {
+        "row": 14,
+        "col": 0,
+        "clue_lt": "Ciklo sąlyga, kuri veikia kaip x<100, naudojant bitinį neigimą.",
+        "clue_en": "Loop condition equivalent to x<100 using bitwise negation.",
+        "answer": "~99+x",
+        "init": "x=0",
+        "topic": "golf_arithmetic",
+        "difficulty": 4,
+        "source_tip": "incrementing_decrementing"
+      },
+      {
+        "row": 16,
+        "col": 3,
+        "clue_lt": "Paversk iterable L į sąrašą trumpu splat būdu.",
+        "clue_en": "Convert iterable L to a list using short splat syntax.",
+        "answer": "[*L]",
+        "init": "L=range(3)",
+        "topic": "golf_splat",
+        "difficulty": 1,
+        "source_tip": "splat_on_iterables"
       }
     ]
   }
-};
-</script>
+};</script>
 
 <!-- ===================================================================== -->
 <!--  ENGINE                                                               -->
@@ -779,7 +857,9 @@ const Engine = (() => {
         row: def.row, col: def.col, len: cells.length,
         clue_lt: def.clue_lt || def.clue,
         clue_en: def.clue_en || def.clue,
-        answer: def.answer, init: def.init || "", cells,
+        answer: def.answer, init: def.init || "", 
+        check: def.check || null,
+        cells,
       };
       words.push(w);
       cells.forEach(([rr, cc]) => {
@@ -1005,19 +1085,23 @@ const Engine = (() => {
     return w.cells.every(([r, c]) => letters[key(r, c)]);
   }
 
-  async function evalRepr(expr, initCode = "") {
+  async function evalRepr(expr, initCode = "", checkType = null) {
     const boot = document.getElementById("boot");
     const t = TRANSLATIONS[window.LANG];
     try {
-      if (initCode) {
+      if (checkType === "literal") {
+        return { ok: true, repr: "LITERAL:" + expr.trim() };
+      }
+      if (!pyReady) return { ok: false, err: "Python not ready" };
+
+      let safeInitCode = initCode || "";
+      if (safeInitCode) {
         // Dynamically load packages if needed
-        const imports = initCode.match(/(?:from|import)\s+([a-zA-Z0-9_]+)/g);
+        const imports = safeInitCode.match(/(?:from|import)\s+([a-zA-Z0-9_]+)/g);
         if (imports) {
           const packages = [...new Set(imports.map(i => i.split(/\s+/)[1]))];
           let showingBoot = false;
           for (const pkg of packages) {
-            // Some modules are built-in or already loaded, but pyodide.loadPackage is idempotent
-            // and handles micropip/micropip-compatible packages.
             try {
               const alreadyLoaded = py.loadedPackages && py.loadedPackages[pkg];
               if (!alreadyLoaded) {
@@ -1029,7 +1113,6 @@ const Engine = (() => {
                 try {
                     await py.loadPackage(pkg);
                 } catch (e) {
-                    // Fallback to micropip for packages not in the main repository
                     await py.loadPackage("micropip");
                     await py.runPythonAsync(`import micropip; await micropip.install("${pkg}")`);
                 }
@@ -1039,31 +1122,74 @@ const Engine = (() => {
             }
           }
         }
-        await py.runPythonAsync(initCode);
       }
-      // Wrap starred expressions like "*map(print,L)," into parentheses "(*map(print,L),)"
-      // to make them valid expressions for Python's eval().
+
       let cleanExpr = expr.trim();
       if (cleanExpr.startsWith("*") && cleanExpr.endsWith(",")) {
         cleanExpr = "(" + cleanExpr + ")";
       }
+      
       const pyCode = `
 import inspect
+import ast
+import json
+
 def _get_repr(val):
     if (inspect.isgenerator(val) or 
         (hasattr(val, "__iter__") and hasattr(val, "__next__") and not isinstance(val, (str, bytes)))):
         return "list(" + repr(list(val)) + ")"
     if hasattr(val, "__class__") and not isinstance(val, (int, float, str, list, dict, set, tuple, bool, type(None))):
-        # For custom objects, use class name instead of default repr which includes memory address
         return f"<{val.__class__.__module__}.{val.__class__.__name__} object>"
     return repr(val)
 
+def _normalize_ast(code):
+    tree = ast.parse(code)
+    class ASTNormalizer(ast.NodeTransformer):
+        def visit_Assign(self, node):
+            self.generic_visit(node)
+            if len(node.targets) > 1:
+                node.targets.sort(key=lambda t: ast.dump(t))
+            return node
+    tree = ASTNormalizer().visit(tree)
+    return "AST:" + ast.dump(tree, annotate_fields=False, include_attributes=False)
+
+_init = ${JSON.stringify(safeInitCode)}
+_expr = ${JSON.stringify(cleanExpr)}
+_check_type = ${JSON.stringify(checkType)}
+
+# Setup clean environment
+_ns = {}
 try:
-    _res = _get_repr(eval(${JSON.stringify(cleanExpr)}))
-finally:
-    # Cleanup to avoid polluting global namespace too much, 
-    # though eval() might have side effects.
+    exec(_init, _ns)
+except Exception as e:
     pass
+# Remove __builtins__ for cleaner comparison and security
+_ns.pop("__builtins__", None)
+
+_res = None
+
+if _check_type == "ast":
+    _res = _normalize_ast(_expr)
+elif _check_type == "eval":
+    _res = _get_repr(eval(_expr, _ns))
+elif _check_type == "exec":
+    _initial_state = {k: _get_repr(v) for k, v in _ns.items()}
+    exec(_expr, _ns)
+    _ns.pop("__builtins__", None)
+    _diff = {k: _get_repr(v) for k, v in _ns.items() if k not in _initial_state or _initial_state[k] != _get_repr(v)}
+    _res = "STMT:" + (json.dumps(_diff, sort_keys=True) if _diff else "OK")
+else:
+    # Default logic: eval then exec
+    try:
+        _val = eval(_expr, _ns)
+        _res = _get_repr(_val)
+    except SyntaxError:
+        _initial_state = {k: _get_repr(v) for k, v in _ns.items()}
+        exec(_expr, _ns)
+        _ns.pop("__builtins__", None)
+        _diff = {k: _get_repr(v) for k, v in _ns.items() if k not in _initial_state or _initial_state[k] != _get_repr(v)}
+        _res = "STMT:" + (json.dumps(_diff, sort_keys=True) if _diff else "OK")
+
 _res
 `.trim();
       const r = await py.runPythonAsync(pyCode);
@@ -1076,25 +1202,46 @@ _res
   }
 
   async function checkWord(w, { quiet = false } = {}) {
-    if (!pyReady || !isFilled(w)) return;
+    if (!pyReady && (!w.check || w.check !== "literal")) return;
+    if (!isFilled(w)) return;
     const typed = readWord(w);
     let correct = false, info = "";
+    const checkType = w.check || window.CHECK_MODE;
 
-    if (window.CHECK_MODE === "literal") {
+    if (checkType === "literal") {
       correct = typed === w.answer;
-      info = correct ? `${w.clue} = ${typed}` : `${typed} ? ${w.answer}`;
+      info = correct ? `${w.clue_lt || w.clue_en || w.clue} = ${typed}` : `${typed} ? ${w.answer}`;
     } else {
-      const got = await evalRepr(typed, w.init);
-      const want = await evalRepr(w.answer, w.init);
+      const got = await evalRepr(typed, w.init, checkType);
+      const want = await evalRepr(w.answer, w.init, checkType);
       if (!got.ok) { info = "? " + got.err; }
       else if (!want.ok) { info = "? bad answer key: " + want.err; }
       else { 
         correct = got.repr === want.repr; 
         let displayRepr = got.repr;
-        if (displayRepr.startsWith("list(") && displayRepr.endsWith(")")) {
-            displayRepr = displayRepr.substring(5, displayRepr.length - 1);
+        if (displayRepr.startsWith("AST:")) {
+            info = correct ? "AST matched" : `AST mismatch`;
+            if (!correct) {
+                console.log("AST mismatch:", { typed, got: got.repr, answer: w.answer, want: want.repr });
+            }
+        } else if (displayRepr.startsWith("STMT:")) {
+            if (displayRepr === "STMT:OK") {
+                info = `statement ok`;
+            } else {
+                try {
+                    const diff = JSON.parse(displayRepr.substring(5));
+                    const changes = Object.entries(diff).map(([k, v]) => `${k}=${v}`).join(", ");
+                    info = `changes: ${changes}`;
+                } catch (e) {
+                    info = `statement ok`;
+                }
+            }
+        } else {
+            if (displayRepr.startsWith("list(") && displayRepr.endsWith(")")) {
+                displayRepr = displayRepr.substring(5, displayRepr.length - 1);
+            }
+            info = `eval(${typed}) ? ${displayRepr}`; 
         }
-        info = `eval(${typed}) ? ${displayRepr}`; 
       }
     }
 
@@ -1192,8 +1339,27 @@ _res
     if (!w) return;
     if (!pyReady) { out.textContent = t.loadingCrossword; return; }
     const initCode = w ? (w.init || "") : "";
-    const res = await evalRepr(code, initCode);
-    let msg = res.ok ? "? " + res.repr : "? " + res.err;
+    const res = await evalRepr(code, initCode, "exec");
+    let msg = "";
+    if (res.ok) {
+        if (res.repr.startsWith("STMT:")) {
+            if (res.repr === "STMT:OK") {
+                msg = "? statement ok";
+            } else {
+                try {
+                    const diff = JSON.parse(res.repr.substring(5));
+                    const changes = Object.entries(diff).map(([k, v]) => `${k}=${v}`).join(", ");
+                    msg = `? changes: ${changes}`;
+                } catch (e) {
+                    msg = "? statement ok";
+                }
+            }
+        } else {
+            msg = "? " + res.repr;
+        }
+    } else {
+        msg = "? " + res.err;
+    }
     if (w && w.init) msg = `(init: ${w.init}) ` + msg;
     out.textContent = msg;
   }

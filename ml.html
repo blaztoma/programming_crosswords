@@ -1009,9 +1009,10 @@ const Engine = (() => {
     const boot = document.getElementById("boot");
     const t = TRANSLATIONS[window.LANG];
     try {
-      if (initCode) {
+      let safeInitCode = initCode || "";
+      if (safeInitCode) {
         // Dynamically load packages if needed
-        const imports = initCode.match(/(?:from|import)\s+([a-zA-Z0-9_]+)/g);
+        const imports = safeInitCode.match(/(?:from|import)\s+([a-zA-Z0-9_]+)/g);
         if (imports) {
           const packages = [...new Set(imports.map(i => i.split(/\s+/)[1]))];
           let showingBoot = false;
@@ -1039,7 +1040,7 @@ const Engine = (() => {
             }
           }
         }
-        await py.runPythonAsync(initCode);
+        await py.runPythonAsync(safeInitCode);
       }
       // Wrap starred expressions like "*map(print,L)," into parentheses "(*map(print,L),)"
       // to make them valid expressions for Python's eval().
@@ -1192,8 +1193,27 @@ _res
     if (!w) return;
     if (!pyReady) { out.textContent = t.loadingCrossword; return; }
     const initCode = w ? (w.init || "") : "";
-    const res = await evalRepr(code, initCode);
-    let msg = res.ok ? "? " + res.repr : "? " + res.err;
+    const res = await evalRepr(code, initCode, "exec");
+    let msg = "";
+    if (res.ok) {
+        if (res.repr && res.repr.startsWith("STMT:")) {
+            if (res.repr === "STMT:OK") {
+                msg = "? statement ok";
+            } else {
+                try {
+                    const diff = JSON.parse(res.repr.substring(5));
+                    const changes = Object.entries(diff).map(([k, v]) => `${k}=${v}`).join(", ");
+                    msg = `? changes: ${changes}`;
+                } catch (e) {
+                    msg = "? statement ok";
+                }
+            }
+        } else {
+            msg = "? " + res.repr;
+        }
+    } else {
+        msg = "? " + res.err;
+    }
     if (w && w.init) msg = `(init: ${w.init}) ` + msg;
     out.textContent = msg;
   }

@@ -38,12 +38,9 @@
   .tagline { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
   .tagline code { background: var(--surface); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; }
 
-  .layout { display: flex; gap: 2rem; flex-wrap: nowrap; align-items: flex-start; justify-content: center; }
-  @media (max-width: 900px) {
-    .layout { flex-wrap: wrap; }
-  }
+  .layout { display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
   .board-col { flex: 0 0 auto; }
-  .side-col  { flex: 0 0 400px; min-width: 250px; }
+  .side-col  { flex: 1 1 400px; min-width: 300px; }
 
   /* ---- grid style ---- */
   /* gridlines: the table background shows through 2px gaps between cells */
@@ -1095,6 +1092,8 @@ const Engine = (() => {
       if (!pyReady) return { ok: false, err: "Python not ready" };
 
       let safeInitCode = initCode || "";
+      let templateMode = safeInitCode.includes("[[userentry]]");
+
       if (safeInitCode) {
         // Dynamically load packages if needed
         const imports = safeInitCode.match(/(?:from|import)\s+([a-zA-Z0-9_]+)/g);
@@ -1129,7 +1128,38 @@ const Engine = (() => {
         cleanExpr = "(" + cleanExpr + ")";
       }
       
-      const pyCode = `
+      let pyCode = "";
+      if (templateMode) {
+          const fullCode = safeInitCode.replace("[[userentry]]", cleanExpr);
+          pyCode = `
+import inspect
+import ast
+import json
+import sys
+from io import StringIO
+
+def _get_repr(val):
+    if (inspect.isgenerator(val) or 
+        (hasattr(val, "__iter__") and hasattr(val, "__next__") and not isinstance(val, (str, bytes)))):
+        return "list(" + repr(list(val)) + ")"
+    if hasattr(val, "__class__") and not isinstance(val, (int, float, str, list, dict, set, tuple, bool, type(None))):
+        return f"<{val.__class__.__module__}.{val.__class__.__name__} object>"
+    return repr(val)
+
+_full_code = ${JSON.stringify(fullCode)}
+_ns = {}
+_old_stdout = sys.stdout
+sys.stdout = StringIO()
+try:
+    exec(_full_code, _ns)
+    _res = sys.stdout.getvalue().trim()
+finally:
+    sys.stdout = _old_stdout
+
+_res
+          `.trim();
+      } else {
+          pyCode = `
 import inspect
 import ast
 import json
@@ -1192,6 +1222,7 @@ else:
 
 _res
 `.trim();
+      }
       const r = await py.runPythonAsync(pyCode);
       return { ok: true, repr: r };
     } catch (e) {

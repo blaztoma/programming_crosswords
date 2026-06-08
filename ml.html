@@ -38,12 +38,9 @@
   .tagline { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
   .tagline code { background: var(--surface); border: 1px solid var(--line); padding: 1px 5px; border-radius: 4px; }
 
-  .layout { display: flex; gap: 2rem; flex-wrap: nowrap; align-items: flex-start; justify-content: center; }
-  @media (max-width: 900px) {
-    .layout { flex-wrap: wrap; }
-  }
+  .layout { display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
   .board-col { flex: 0 0 auto; }
-  .side-col  { flex: 0 0 400px; min-width: 250px; }
+  .side-col  { flex: 1 1 400px; min-width: 300px; }
 
   /* ---- grid style ---- */
   /* gridlines: the table background shows through 2px gaps between cells */

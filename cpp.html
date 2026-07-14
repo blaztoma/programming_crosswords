@@ -585,8 +585,8 @@ window.PUZZLE = {
       {
         row: 10,
         col: 6,
-        clue_lt: "Duota: char c='A'; Rezultatas: 'a'",
-        clue_en: "Given: char c='A'; Result: 'a'",
+        clue_lt: "Duota: char c='A'; Rezultatas: 'a' (ASCII atitikmuo)",
+        clue_en: "Given: char c='A'; Result: 'a'  (ASCII code)",
         answer: "tolower(c)",
         init: "char c='A';",
         topic: "cpp_chars",
@@ -1127,6 +1127,7 @@ int main() {
       let output = "";
       let runtimeError = null;
       const config = {
+        maxTimeout: 3000,
         stdio: {
           write: (s) => { output += s; },
           promiseError: (e) => { runtimeError = e; }
